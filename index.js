@@ -27,6 +27,126 @@ let curLives = 3
 let heartsArr = []
 let hearts = []
 
+let enemiesImages = {
+    cultist: {
+        walk: [
+            'img/Enemies/cultist/cultist_priest_walk_1.png',
+            'img/Enemies/cultist/cultist_priest_walk_2.png',
+            'img/Enemies/cultist/cultist_priest_walk_3.png',
+            'img/Enemies/cultist/cultist_priest_walk_4.png'
+        ],
+        attack: [
+            'img/Enemies/cultist/cultist_priest_attack_1.png',
+            'img/Enemies/cultist/cultist_priest_attack_2.png',
+            'img/Enemies/cultist/cultist_priest_attack_3.png',
+            'img/Enemies/cultist/cultist_priest_attack_4.png',
+            'img/Enemies/cultist/cultist_priest_attack_5.png'
+        ],
+        hurt: [
+            'img/Enemies/cultist/cultist_priest_takehit_1.png',
+            'img/Enemies/cultist/cultist_priest_takehit_2.png',
+            'img/Enemies/cultist/cultist_priest_takehit_3.png',
+            'img/Enemies/cultist/cultist_priest_takehit_4.png'
+        ],
+        idle: [
+            'img/Enemies/cultist/cultist_priest_idle_1.png',
+            'img/Enemies/cultist/cultist_priest_idle_2.png',
+            'img/Enemies/cultist/cultist_priest_idle_3.png',
+            'img/Enemies/cultist/cultist_priest_idle_4.png',
+            'img/Enemies/cultist/cultist_priest_idle_5.png'
+        ],
+        death: [
+            'img/Enemies/cultist/cultist_priest_die_1.png',
+            'img/Enemies/cultist/cultist_priest_die_2.png',
+            'img/Enemies/cultist/cultist_priest_die_3.png',
+            'img/Enemies/cultist/cultist_priest_die_4.png',
+            'img/Enemies/cultist/cultist_priest_die_5.png',
+            'img/Enemies/cultist/cultist_priest_die_6.png'
+        ]
+    },
+    minotaur: {
+        walk: [
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_000.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_001.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_002.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_003.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_004.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_005.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_006.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_007.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_008.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_009.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_010.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_011.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_012.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_013.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_014.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_015.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_016.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Walking/Minotaur_03_Walking_017.png'
+        ],
+        attack: [
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_000.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_001.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_002.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_003.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_004.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_005.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_006.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_007.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_008.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_009.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_010.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Attacking/Minotaur_03_Attacking_011.png'
+        ],
+        hurt: [
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_000.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_001.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_002.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_003.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_004.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_005.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_006.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_007.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_008.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_009.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_010.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_011.png'
+        ],
+        idle: [
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_000.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_001.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_002.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_003.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_004.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_005.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_006.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_007.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_008.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_009.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_010.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_011.png'
+        ],
+        death: [
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_000.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_001.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_002.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_003.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_004.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_005.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_006.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_007.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_008.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_009.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_010.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_011.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_012.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_013.png',
+            'img/Enemies/Minotaur_03/PNG Sequences/Dying/Minotaur_03_Dying_014.png'
+        ]
+    }
+}
+
 let ring = new Audio('audio/key.wav')
 let sound = new Audio('audio/haunted.mp3');
 sound.play()
@@ -216,7 +336,7 @@ const addTiles = (i) => {
 
 // ===================================================ENEMIES======================================================
 
-class Enemy {
+class EnemyWithOneImg {
     posX;
     posY;
     state;
@@ -407,6 +527,191 @@ class Enemy {
     }
 }
 
+class EnemyWithSeparateImg {
+    posX;
+    posY;
+    state;
+    animateWasChange;
+    startX;
+    direction;
+    img;
+    block;
+    blockSize;
+    imgNum;
+    timer;
+    stop;
+    lives;
+    death;
+    dist;
+    char;
+    imgArray;
+    speed;
+    constructor(x, y, dist, char, speed) {
+        this.char = char
+        this.imgArray = char.idle
+        this.speed = speed
+        this.dist = dist
+        this.posX = x
+        this.startX = this.posX
+        this.posY = y
+        this.direction = 1
+        this.blockSize = 200
+        this.imgNum = 0
+        this.state = 'idle'
+        this.animateWasChange = false
+        this.stop = false
+        this.changeAnim('idle')
+        this.createImg()
+        this.lifeCycle()
+        this.lives = 3;
+
+    }
+    createImg() {
+        this.block = window.document.createElement('div')
+        this.block.style.position = 'absolute'
+        this.block.style.left = (this.posX * 64).toString() + 'px'
+        this.block.style.bottom = (this.posY * 64).toString() + 'px'
+        this.block.style.width = `${this.blockSize}px`
+        this.block.style.height = `${this.blockSize}px`
+        this.block.style.overflow = 'hidden'
+        this.block.style.transition = '0.5s'
+
+        this.img = window.document.createElement('img')
+        this.img.src = this.imgArray[0]
+        this.img.style.position = 'absolute'
+        this.img.style.left = '0px'
+        this.img.style.bottom = '-20px'
+        this.img.style.width = `${this.blockSize}px`
+        this.img.style.height = `200px`
+        this.img.className += "enemy"
+
+        this.block.appendChild(this.img)
+        canvas.appendChild(this.block)
+    }
+    lifeCycle() {
+        // clearInterval(this.timer)
+        this.timer = setInterval(() => {
+            if (this.animateWasChange) {
+                this.animateWasChange = false
+                switch (this.state) {
+                    case 'idle':
+                        this.setAction(this.char.idle)
+                        break;
+                    case 'attack':
+                        this.setAction(this.char.attack)
+                        break;
+                    case 'walk':
+                        this.setAction(this.char.walk)
+                        break;
+                    case 'hurt':
+                        this.setAction(this.char.hurt)
+                        break;
+                    case 'death':
+                        this.setAction(this.char.death)
+                        break;
+                    default:
+                        break;
+                }
+            }
+            this.imgNum++
+            this.checkCol();
+            if (this.stop != true) {
+                if (this.state != 'walk') {
+                    this.changeAnim('walk')
+                }
+                this.move()
+            }
+            else {
+                if (this.state != 'hurt') {
+                    if (!this.death) {
+                        this.changeAnim('attack')
+                    }
+                }
+            }
+            this.animate()
+        }, this.speed)
+    }
+    animate() {
+        if (this.imgArray.length <= this.imgNum) {
+            if (this.state === 'death') {
+                this.imgNum = 0
+                clearInterval(this.timer)
+                return
+            }
+            this.imgNum = 0
+            if (this.state === 'attack') {
+                curLives -= 1
+                attackSound.play()
+                updateHearts()
+                if (curLives <= 0) {
+                    dead = true
+                }
+            }
+            if (this.state === 'hurt') {
+                if (this.death != true) {
+                    if (this.lives > 0) {
+                        this.lives--
+                        attackSound.play()
+                        if (this.lives > 0) {
+                            this.changeAnim('attack')
+                        }
+                        else {
+                            this.death = true
+                            this.changeAnim('death')
+                        }
+                    }
+                }
+            }
+        }
+        this.img.src = this.imgArray[this.imgNum]
+    }
+    changeAnim(state) {
+        this.animateWasChange = true
+        this.state = state
+    }
+    setAction(imgArray) {
+        this.imgArray = imgArray
+    }
+    move() {
+        if (this.posX > (this.startX + this.dist) || this.posX < this.startX) {
+            this.direction *= -1
+        }
+        this.posX += this.direction / 2
+        this.img.style.transform = `scale(${this.direction},1)`
+        this.block.style.left = (this.posX * 64).toString() + 'px'
+    }
+    checkDamage() {
+        this.stop = true
+        if (attack === true) {
+            if ((direction === -1 && heroX < this.posX) || (direction === 1 && heroX > this.posX)) {
+            }
+            else {
+                this.changeAnim('hurt')
+            }
+        }
+    }
+    checkCol() {
+        if (!this.death) {
+            if (!dead) {
+                if (this.posY === heroY && (this.posX + (this.direction)) === heroX) {
+                    this.checkDamage()
+                }
+                else if (this.posY === heroY && (this.posX - this.direction) === heroX) {
+                    this.checkDamage()
+                    this.img.style.transform = `scale(${this.direction *= -1},1)`
+                }
+                else {
+                    this.stop = false
+                }
+            }
+            else {
+                this.stop = false
+            }
+
+        }
+    }
+}
+
 class Heart {
     img;
     x;
@@ -455,7 +760,6 @@ class Items {
         this.lifeCycle()
     }
     createImg() {
-        console.log('ssds')
         this.block = window.document.createElement('div')
         this.block.style.position = 'absolute'
         this.block.style.left = (this.posX * 64).toString() + 'px'
@@ -557,10 +861,12 @@ const appStart = () => {
     addHearts()
     updateHearts()
     enemies = [
-        new Enemy(8, 1, 12),
-        new Enemy(12, 1, 10),
-        new Enemy(4, 6, 9),
-        new Enemy(14, 9, 4)
+        new EnemyWithSeparateImg(8, 1, 12, enemiesImages.cultist, 100),
+        new EnemyWithSeparateImg(12, 1, 10, enemiesImages.cultist, 100),
+        new EnemyWithSeparateImg(4, 6, 9, enemiesImages.minotaur, 75),
+        new EnemyWithSeparateImg(14, 9, 4, enemiesImages.minotaur, 75),
+        new EnemyWithSeparateImg(6, 1, 8, enemiesImages.cultist, 100),
+        new EnemyWithSeparateImg(10, 1, 5, enemiesImages.cultist, 100),
     ]
     hearts = [
         new Items(3, 1),
