@@ -161,6 +161,7 @@ const setSprite = (imgWidth, imgSrc, maxPose, moveX, moveY, xDistance, yDistance
     hero.style.left = '0px'
     hero.style.width = imgWidth
     hero.src = imgSrc
+    // hero.style.filter = 'saturate(1000%)'
     hero.style.transform = `scale(${direction},1)`
     if (blockPosition > window.screen.width) {
         blockPosition = window.screen.width
@@ -541,12 +542,17 @@ class EnemyWithSeparateImg {
     timer;
     stop;
     lives;
+    armor;
     death;
     dist;
     char;
     imgArray;
     speed;
-    constructor(x, y, dist, char, speed) {
+    healthArray;
+    armorArray;
+    constructor(x, y, dist, char, speed, lives, armor) {
+        this.healthArray = []
+        this.armorArray = []
         this.char = char
         this.imgArray = char.idle
         this.speed = speed
@@ -563,7 +569,10 @@ class EnemyWithSeparateImg {
         this.changeAnim('idle')
         this.createImg()
         this.lifeCycle()
-        this.lives = 3;
+        this.lives = lives;
+        this.armor = armor
+        this.createHealthBar()
+        this.createArmorBar()
 
     }
     createImg() {
@@ -587,6 +596,64 @@ class EnemyWithSeparateImg {
 
         this.block.appendChild(this.img)
         canvas.appendChild(this.block)
+    }
+    createHealthBar() {
+        let bar = window.document.createElement('div')
+        bar.style.position = 'absolute'
+        bar.style.left = '0px'
+        bar.style.top = '0px'
+        bar.style.height = `8px`
+        bar.style.width = '100%'
+        bar.style.display = 'flex'
+        // bar.style.background = 'white'
+        bar.style.justifyContent = 'center'
+        bar.style.gap = '5px'
+        this.block.appendChild(bar)
+        for (let i = 0; i < this.lives; i++) {
+            let health = window.document.createElement('div')
+            health.style.position = 'relative'
+            { health.style.top = '0px' }
+            health.style.width = `12px`
+            health.style.height = `8px`
+            health.style.border = '1px solid white'
+            health.style.borderRadius = '12px'
+            health.style.background = 'red'
+            this.healthArray.push(health)
+            bar.appendChild(this.healthArray[i])
+        }
+    }
+    createArmorBar() {
+        let bar = window.document.createElement('div')
+        bar.style.position = 'absolute'
+        bar.style.left = '0px'
+        bar.style.top = '0px'
+        bar.style.height = `8px`
+        bar.style.width = '100%'
+        bar.style.display = 'flex'
+        // bar.style.background = 'white'
+        bar.style.justifyContent = 'center'
+        bar.style.gap = '5px'
+        this.block.appendChild(bar)
+        for (let i = 0; i < this.armor; i++) {
+            let health = window.document.createElement('div')
+            health.style.position = 'relative'
+            { health.style.top = '10px' }
+            health.style.width = `12px`
+            health.style.height = `8px`
+            health.style.border = '1px solid black'
+            health.style.borderRadius = '12px'
+            health.style.background = 'gray'
+            this.armorArray.push(health)
+            bar.appendChild(this.armorArray[i])
+        }
+    }
+    updateHealthBar() {
+        this.healthArray[this.healthArray.length - 1].remove()
+        this.healthArray.pop()
+    }
+    updateArmorBar() {
+        this.armorArray[this.armorArray.length - 1].remove()
+        this.armorArray.pop()
     }
     lifeCycle() {
         // clearInterval(this.timer)
@@ -649,15 +716,23 @@ class EnemyWithSeparateImg {
             }
             if (this.state === 'hurt') {
                 if (this.death != true) {
-                    if (this.lives > 0) {
-                        this.lives--
-                        attackSound.play()
+                    if (this.armor > 0) {
+                        this.armor--
+                        this.updateArmorBar()
+                        this.changeAnim('attack')
+                    }
+                    else {
                         if (this.lives > 0) {
-                            this.changeAnim('attack')
-                        }
-                        else {
-                            this.death = true
-                            this.changeAnim('death')
+                            this.lives--
+                            attackSound.play()
+                            this.updateHealthBar()
+                            if (this.lives > 0) {
+                                this.changeAnim('attack')
+                            }
+                            else {
+                                this.death = true
+                                this.changeAnim('death')
+                            }
                         }
                     }
                 }
@@ -861,12 +936,12 @@ const appStart = () => {
     addHearts()
     updateHearts()
     enemies = [
-        new EnemyWithSeparateImg(8, 1, 12, enemiesImages.cultist, 100),
-        new EnemyWithSeparateImg(12, 1, 10, enemiesImages.cultist, 100),
-        new EnemyWithSeparateImg(4, 6, 9, enemiesImages.minotaur, 75),
-        new EnemyWithSeparateImg(14, 9, 4, enemiesImages.minotaur, 75),
-        new EnemyWithSeparateImg(6, 1, 8, enemiesImages.cultist, 100),
-        new EnemyWithSeparateImg(10, 1, 5, enemiesImages.cultist, 100),
+        new EnemyWithSeparateImg(8, 1, 12, enemiesImages.cultist, 100, 3),
+        new EnemyWithSeparateImg(12, 1, 10, enemiesImages.cultist, 100, 3),
+        new EnemyWithSeparateImg(4, 6, 9, enemiesImages.minotaur, 50, 6, 4),
+        new EnemyWithSeparateImg(14, 9, 4, enemiesImages.minotaur, 50, 6, 4),
+        new EnemyWithSeparateImg(6, 1, 8, enemiesImages.cultist, 100, 3),
+        new EnemyWithSeparateImg(10, 1, 5, enemiesImages.cultist, 100, 3),
     ]
     hearts = [
         new Items(3, 1),
