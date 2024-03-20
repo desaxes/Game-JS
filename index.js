@@ -20,13 +20,13 @@ let heroY = Math.floor(Number.parseInt(heroBlock.style.bottom) / 64)
 let high = 0
 let maxHigh = 320
 let timer = null
-
 let tileArray = []
+let objectsArray = []
 let maxLives = 5
 let curLives = 3
 let heartsArr = []
-let hearts = []
-
+let items = []
+let enemies = []
 let enemiesImages = {
     cultist: {
         walk: [
@@ -101,17 +101,17 @@ let enemiesImages = {
         ],
         hurt: [
             'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_000.png',
-            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_001.png',
+            // 'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_001.png',
             'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_002.png',
-            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_003.png',
+            // 'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_003.png',
             'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_004.png',
-            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_005.png',
+            // 'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_005.png',
             'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_006.png',
-            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_007.png',
+            // 'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_007.png',
             'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_008.png',
-            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_009.png',
+            // 'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_009.png',
             'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_010.png',
-            'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_011.png'
+            // 'img/Enemies/Minotaur_03/PNG Sequences/Hurt/Minotaur_03_Hurt_011.png'
         ],
         idle: [
             'img/Enemies/Minotaur_03/PNG Sequences/Idle/Minotaur_03_Idle_000.png',
@@ -158,17 +158,18 @@ footsSound.volume = 0.2
 //=================================================ANIMATIONS=======================================================
 
 const setSprite = (imgWidth, imgSrc, maxPose, moveX, moveY, xDistance, yDistance) => {
+    heroBlock.style.left = `${blockPosition}px`
     hero.style.left = '0px'
     hero.style.width = imgWidth
     hero.src = imgSrc
     // hero.style.filter = 'saturate(1000%)'
     hero.style.transform = `scale(${direction},1)`
-    if (blockPosition > window.screen.width) {
-        blockPosition = window.screen.width
-    }
-    if (blockPosition < 0) {
-        blockPosition = 0
-    }
+    // if (blockPosition > window.screen.width) {
+    //     blockPosition = window.screen.width
+    // }
+    // if (blockPosition < 0) {
+    //     blockPosition = 0
+    // }
     if (heroPosition >= maxPose) {
         if (dead) {
             switch (direction) {
@@ -194,8 +195,17 @@ const setSprite = (imgWidth, imgSrc, maxPose, moveX, moveY, xDistance, yDistance
         heroPosition = heroPosition + 1
     }
     if (moveX) {
-        blockPosition = blockPosition - (xDistance * direction)
-        heroBlock.style.left = `${blockPosition}px`
+        // heroX = heroX + 0.5 * direction
+        if (blockPosition > window.screen.width - 200 && direction === 1) {
+            moveWorld(direction)
+        }
+        else if (blockPosition < 200 && direction === -1) {
+            moveWorld(direction)
+        }
+        else {
+            blockPosition = blockPosition - (xDistance * direction)
+            heroBlock.style.left = `${blockPosition}px`
+        }
     }
     if (moveY) {
         if (jump) {
@@ -247,16 +257,27 @@ const heroAnim = (move) => {
 const updateXY = () => {
     heroX = Math.floor(Number.parseInt(heroBlock.style.left) / 64)
     heroY = Math.floor(Number.parseInt(heroBlock.style.bottom) / 64)
+    // console.log(heroX)
 }
 const checkTile = () => {
     updateXY()
-    let tile = tileArray.find(e => e[0] - 1 === heroX && e[1] + 1 === heroY)
+    let tile = tileArray.find(e => Math.trunc(e[0]) === Math.trunc(heroX) + 1 && e[1] + 1 === heroY)
     if (tile === undefined) {
         falling = true
     }
-    else { falling = false }
+    else {
+        falling = false
+    }
+    console.log(heroX)
 }
-
+const moveWorld = (dir) => {
+    objectsArray.map(e => {
+        e.style.left = (Number.parseInt(e.style.left) - 32 * dir).toString() + 'px'
+    })
+    tileArray.map(e => { e[0] = e[0] - 0.5 * dir })
+    enemies.map(e => e.moveWorld(dir))
+    items.map(e => e.moveWorld(dir))
+}
 //========================================================BUTTONS===================================================
 
 // moveStart = (e) => {
@@ -283,20 +304,22 @@ const checkTile = () => {
 // window.onmousedown = moveStart
 // window.onmouseup = moveEnd
 window.addEventListener('keydown', (e) => {
-    if (e.code === 'KeyD') {
-        direction = 1
-        move = true
-    }
-    else if (e.code === 'KeyA') {
-        direction = -1
-        move = true
-    }
-    else if (falling === false && jump === false) {
-        if (e.code === 'KeyW') {
-            jump = true
+    if (!dead) {
+        if (e.code === 'KeyD') {
+            direction = 1
+            move = true
         }
-        else if (e.code === 'KeyF') {
-            attack = true
+        else if (e.code === 'KeyA') {
+            direction = -1
+            move = true
+        }
+        else if (falling === false && jump === false) {
+            if (e.code === 'KeyW') {
+                jump = true
+            }
+            else if (e.code === 'KeyF') {
+                attack = true
+            }
         }
     }
 }
@@ -323,8 +346,10 @@ const createTile = (x, y = 0) => {
     tile.style.bottom = (y * 64).toString() + 'px'
     tile.style.width = '64px'
     tile.style.height = '64px'
+    tile.style.transition = '0.2s'
     canvas.appendChild(tile)
     tileArray.push([x, y])
+    objectsArray.push(tile)
 }
 const createTilesPlatform = (startX, startY, length) => {
     for (let i = 0; i < length; i++) {
@@ -583,7 +608,7 @@ class EnemyWithSeparateImg {
         this.block.style.width = `${this.blockSize}px`
         this.block.style.height = `${this.blockSize}px`
         this.block.style.overflow = 'hidden'
-        this.block.style.transition = '0.5s'
+        this.block.style.transition = '0.3s'
 
         this.img = window.document.createElement('img')
         this.img.src = this.imgArray[0]
@@ -655,6 +680,10 @@ class EnemyWithSeparateImg {
         this.armorArray[this.armorArray.length - 1].remove()
         this.armorArray.pop()
     }
+    moveWorld(dir) {
+        this.startX = this.startX - 0.5 * dir
+        this.posX = this.posX - 0.5 * dir
+    }
     lifeCycle() {
         // clearInterval(this.timer)
         this.timer = setInterval(() => {
@@ -703,6 +732,7 @@ class EnemyWithSeparateImg {
             if (this.state === 'death') {
                 this.imgNum = 0
                 clearInterval(this.timer)
+                this.img.style.display = 'none'
                 return
             }
             this.imgNum = 0
@@ -842,7 +872,7 @@ class Items {
         this.block.style.width = `${this.blockSize}px`
         this.block.style.height = `${this.blockSize}px`
         this.block.style.overflow = 'hidden'
-        this.block.style.transition = '0.5s'
+        this.block.style.transition = '0.3s'
 
         this.img = window.document.createElement('img')
         this.img.src = 'img/Icons/Full_heart.png'
@@ -864,7 +894,7 @@ class Items {
             this.posY += this.direction / 2
             this.block.style.bottom = (this.posY * 64).toString() + 'px'
             this.checkCol()
-        }, 200)
+        }, 150)
     }
     checkCol() {
         if (this.posY >= heroY && this.posY < heroY + 2) {
@@ -876,11 +906,15 @@ class Items {
                     this.useble = false
                     clearInterval(this.timer)
                     this.img.style.display = 'none'
-                    let index = hearts.findIndex(e => e.posX === this.posX)
-                    hearts.splice(index, 1)
+                    let index = items.findIndex(e => e.posX === this.posX)
+                    items.splice(index, 1)
                 }
             }
         }
+    }
+    moveWorld(dir) {
+        this.posX = this.posX - 0.5 * dir
+        this.block.style.left = (this.posX * 64).toString() + 'px'
     }
 }
 //======================================================START=FUNCTIONS===========================================
@@ -925,7 +959,7 @@ const updateHearts = () => {
 }
 const appStart = () => {
     tileArray = []
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < 320; i++) {
         // if (i > 7 && i < 12) {
         //     continue
         // }
@@ -936,14 +970,15 @@ const appStart = () => {
     addHearts()
     updateHearts()
     enemies = [
-        new EnemyWithSeparateImg(8, 1, 12, enemiesImages.cultist, 100, 3),
-        new EnemyWithSeparateImg(12, 1, 10, enemiesImages.cultist, 100, 3),
-        new EnemyWithSeparateImg(4, 6, 9, enemiesImages.minotaur, 50, 6, 4),
-        new EnemyWithSeparateImg(14, 9, 4, enemiesImages.minotaur, 50, 6, 4),
-        new EnemyWithSeparateImg(6, 1, 8, enemiesImages.cultist, 100, 3),
-        new EnemyWithSeparateImg(10, 1, 5, enemiesImages.cultist, 100, 3),
+        new EnemyWithSeparateImg(16, 1, 12, enemiesImages.cultist, 100, 3),
+        new EnemyWithSeparateImg(20, 1, 10, enemiesImages.cultist, 100, 3),
+        new EnemyWithSeparateImg(4, 6, 9, enemiesImages.minotaur, 75, 6, 4),
+        new EnemyWithSeparateImg(14, 9, 4, enemiesImages.minotaur, 75, 6, 4),
+        new EnemyWithSeparateImg(26, 1, 8, enemiesImages.cultist, 100, 3),
+        new EnemyWithSeparateImg(30, 1, 5, enemiesImages.cultist, 100, 3),
+        new EnemyWithSeparateImg(40, 1, 5, enemiesImages.cultist, 100, 3),
     ]
-    hearts = [
+    items = [
         new Items(3, 1),
         new Items(6, 6),
         new Items(15, 9)
@@ -951,7 +986,6 @@ const appStart = () => {
 }
 
 // ======================================================APP=START==================================================
-
-startHero()
 appStart()
+startHero()
 
