@@ -146,7 +146,7 @@ let enemiesImages = {
         ]
     }
 }
-
+let firstBack
 let ring = new Audio('audio/key.wav')
 let sound = new Audio('audio/haunted.mp3');
 sound.play()
@@ -199,12 +199,15 @@ const setSprite = (imgWidth, imgSrc, maxPose, moveX, moveY, xDistance, yDistance
         if (blockPosition > window.screen.width - 200 && direction === 1) {
             moveWorld(direction)
         }
-        else if (blockPosition < 200 && direction === -1) {
+        else if (blockPosition < 200 && direction === -1 && parseInt(firstBack.style.left) < 0) {
             moveWorld(direction)
         }
         else {
-            blockPosition = blockPosition - (xDistance * direction)
-            heroBlock.style.left = `${blockPosition}px`
+            if (blockPosition < 0 && direction === -1) { }
+            else {
+                blockPosition = blockPosition - (xDistance * direction)
+                heroBlock.style.left = `${blockPosition}px`
+            }
         }
     }
     if (moveY) {
@@ -940,6 +943,7 @@ const startHero = () => {
         else {
             heroAnim('idle')
         }
+        console.log(firstBack.style.left)
     }, 100)
 }
 const addHearts = () => {
@@ -957,35 +961,64 @@ const updateHearts = () => {
         heartsArr[i].img.style.display = 'none'
     }
 }
-const appStart = () => {
-    tileArray = []
-    for (let i = 0; i < 320; i++) {
-        // if (i > 7 && i < 12) {
-        //     continue
-        // }
-        addTiles(i)
+const createBackImg = (src, i) => {
+    let img = window.document.createElement('img')
+    img.src = src
+    img.style.transition = '0.2s'
+    img.style.zIndex = -1000
+    img.style.position = 'absolute'
+    img.style.left = i * window.screen.width.toString() + 'px'
+    img.style.width = window.screen.width.toString() + 'px'
+    img.style.height = '100%'
+    objectsArray.push(img)
+    if (i === 0) {
+        firstBack = img
     }
-    createTilesPlatform(5, 5, 10)
-    createTilesPlatform(15, 8, 5)
+    canvas.appendChild(img)
+}
+const createBackground = (src) => {
+    for (let i = 0; i < 5; i++) {
+        createBackImg(src, i)
+    }
+}
+const platformsLvlOne = [
+    { x: 0, y: 0, length: 10 },
+    { x: 15, y: 0, length: 40 },
+    { x: 5, y: 5, length: 10 },
+    { x: 15, y: 8, length: 5 },
+    { x: 22, y: 10, length: 10 }
+]
+const enemiesLvlOne = [
+    new EnemyWithSeparateImg(16, 1, 12, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(20, 1, 10, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(4, 6, 9, enemiesImages.minotaur, 75, 6, 4),
+    new EnemyWithSeparateImg(14, 9, 4, enemiesImages.minotaur, 75, 6, 4),
+    new EnemyWithSeparateImg(26, 1, 8, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(30, 1, 5, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(40, 1, 5, enemiesImages.cultist, 100, 3),
+]
+const itemsLvlOne = [
+    new Items(3, 1),
+    new Items(6, 6),
+    new Items(15, 9)
+]
+const createLevel = (platforms, enemiesArray, itemsArray) => {
+    createBackground("bg_test2.png")
+    tileArray = []
+    for (let i = 0; i < platforms.length; i++) {
+        createTilesPlatform(platforms[i].x, platforms[i].y, platforms[i].length)
+    }
+    enemies = enemiesArray
+    items = itemsArray
+}
+const appStart = () => {
     addHearts()
     updateHearts()
-    enemies = [
-        new EnemyWithSeparateImg(16, 1, 12, enemiesImages.cultist, 100, 3),
-        new EnemyWithSeparateImg(20, 1, 10, enemiesImages.cultist, 100, 3),
-        new EnemyWithSeparateImg(4, 6, 9, enemiesImages.minotaur, 75, 6, 4),
-        new EnemyWithSeparateImg(14, 9, 4, enemiesImages.minotaur, 75, 6, 4),
-        new EnemyWithSeparateImg(26, 1, 8, enemiesImages.cultist, 100, 3),
-        new EnemyWithSeparateImg(30, 1, 5, enemiesImages.cultist, 100, 3),
-        new EnemyWithSeparateImg(40, 1, 5, enemiesImages.cultist, 100, 3),
-    ]
-    items = [
-        new Items(3, 1),
-        new Items(6, 6),
-        new Items(15, 9)
-    ]
+    startHero()
+    createLevel(platformsLvlOne, enemiesLvlOne, itemsLvlOne)
 }
 
 // ======================================================APP=START==================================================
 appStart()
-startHero()
+
 
