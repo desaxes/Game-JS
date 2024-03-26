@@ -15,10 +15,10 @@ let attack = false
 let dead = false
 let direction = 1
 let move = false
-let heroX = Math.floor(Number.parseInt(heroBlock.style.left) / 64)
-let heroY = Math.floor(Number.parseInt(heroBlock.style.bottom) / 64)
+let heroX = Math.floor(Number.parseInt(heroBlock.style.left) / 32)
+let heroY = Math.floor(Number.parseInt(heroBlock.style.bottom) / 32)
 let high = 0
-let maxHigh = 320
+let maxHigh = 160
 let timer = null
 let tileArray = []
 let objectsArray = []
@@ -196,10 +196,10 @@ const setSprite = (imgWidth, imgSrc, maxPose, moveX, moveY, xDistance, yDistance
     }
     if (moveX) {
         // heroX = heroX + 0.5 * direction
-        if (blockPosition > window.screen.width - 200 && direction === 1) {
+        if (blockPosition > window.screen.width - 300 && direction === 1) {
             moveWorld(direction)
         }
-        else if (blockPosition < 200 && direction === -1 && parseInt(firstBack.style.left) < 0) {
+        else if (blockPosition < 300 && direction === -1 && parseInt(firstBack.style.left) < 0) {
             moveWorld(direction)
         }
         else {
@@ -227,29 +227,29 @@ const setSprite = (imgWidth, imgSrc, maxPose, moveX, moveY, xDistance, yDistance
 
     }
     checkTile()
-    hero.style.left = (heroPosition * -200).toString() + 'px'
+    hero.style.left = (heroPosition * -100).toString() + 'px'
 }
 const heroAnim = (move) => {
     switch (move) {
         case 'walk':
-            setSprite('1400px', 'knight-walk.png', 6, true, false, -32, 0)
+            setSprite('700px', 'knight-walk.png', 6, true, false, -32, 0)
             footsSound.play()
             break
         case 'idle':
-            setSprite('800px', 'knight-idle.png', 3)
+            setSprite('400px', 'knight-idle.png', 3)
             break
         case 'jump':
-            setSprite('1200px', 'jump-knight.png', 4, true, true, -32, 96)
+            setSprite('600px', 'jump-knight.png', 4, true, true, -32, 64)
             break
         case 'fall':
-            setSprite('600px', 'knight-fall.png', 2, true, true, -32, -64)
+            setSprite('300px', 'knight-fall.png', 2, true, true, -32, -32)
             break
         case 'attack':
-            setSprite('1200px', 'knight-attack.png', 4)
+            setSprite('600px', 'knight-attack.png', 4)
             swordSound.play()
             break
         case 'death':
-            setSprite('1000px', 'knight-dying.png', 4)
+            setSprite('500px', 'knight-dying.png', 4)
             break
         default: break
     }
@@ -258,8 +258,8 @@ const heroAnim = (move) => {
 // ================================================COORDINATES=====================================================
 
 const updateXY = () => {
-    heroX = Math.floor(Number.parseInt(heroBlock.style.left) / 64)
-    heroY = Math.floor(Number.parseInt(heroBlock.style.bottom) / 64)
+    heroX = Math.floor(Number.parseInt(heroBlock.style.left) / 32)
+    heroY = Math.floor(Number.parseInt(heroBlock.style.bottom) / 32)
     // console.log(heroX)
 }
 const checkTile = () => {
@@ -271,13 +271,13 @@ const checkTile = () => {
     else {
         falling = false
     }
-    console.log(heroX)
+    console.log(heroX,heroY)
 }
 const moveWorld = (dir) => {
     objectsArray.map(e => {
         e.style.left = (Number.parseInt(e.style.left) - 32 * dir).toString() + 'px'
     })
-    tileArray.map(e => { e[0] = e[0] - 0.5 * dir })
+    tileArray.map(e => { e[0] = e[0] - 1 * dir })
     enemies.map(e => e.moveWorld(dir))
     items.map(e => e.moveWorld(dir))
 }
@@ -341,22 +341,32 @@ fsbtn.onclick = () => {
 
 // =================================================OBJECTS========================================================
 
-const createTile = (x, y = 0) => {
+const createTile = (x, y = 0, src) => {
     let tile = window.document.createElement('img')
-    tile.src = 'img/1 Tiles/Tile_21.png'
+    tile.src = src
     tile.style.position = 'absolute'
-    tile.style.left = (x * 64).toString() + 'px'
-    tile.style.bottom = (y * 64).toString() + 'px'
-    tile.style.width = '64px'
-    tile.style.height = '64px'
+    tile.style.left = (x * 32).toString() + 'px'
+    tile.style.bottom = (y * 32).toString() + 'px'
+    tile.style.width = '32px'
+    tile.style.height = '32px'
     tile.style.transition = '0.2s'
     canvas.appendChild(tile)
     tileArray.push([x, y])
     objectsArray.push(tile)
 }
-const createTilesPlatform = (startX, startY, length) => {
-    for (let i = 0; i < length; i++) {
-        createTile(startX + i, startY)
+const createTilesPlatform = (startX, startY, length, floorSrc, groundSrc, floor) => {
+    if (floor) {
+        for (let a = startY; a >= 0; a--) {
+            for (let i = 0; i < length; i++) {
+                if (a === startY) { createTile(startX + i, a, floorSrc) }
+                else { createTile(startX + i, a, groundSrc) }
+            }
+        }
+    }
+    else {
+        for (let i = 0; i < length; i++) {
+            createTile(startX + i, startY, floorSrc)
+        }
     }
 }
 const addTiles = (i) => {
@@ -589,7 +599,7 @@ class EnemyWithSeparateImg {
         this.startX = this.posX
         this.posY = y
         this.direction = 1
-        this.blockSize = 200
+        this.blockSize = 100
         this.imgNum = 0
         this.state = 'idle'
         this.animateWasChange = false
@@ -606,8 +616,8 @@ class EnemyWithSeparateImg {
     createImg() {
         this.block = window.document.createElement('div')
         this.block.style.position = 'absolute'
-        this.block.style.left = (this.posX * 64).toString() + 'px'
-        this.block.style.bottom = (this.posY * 64).toString() + 'px'
+        this.block.style.left = (this.posX * 32).toString() + 'px'
+        this.block.style.bottom = (this.posY * 32).toString() + 'px'
         this.block.style.width = `${this.blockSize}px`
         this.block.style.height = `${this.blockSize}px`
         this.block.style.overflow = 'hidden'
@@ -619,7 +629,7 @@ class EnemyWithSeparateImg {
         this.img.style.left = '0px'
         this.img.style.bottom = '-20px'
         this.img.style.width = `${this.blockSize}px`
-        this.img.style.height = `200px`
+        this.img.style.height = `128px`
         this.img.className += "enemy"
 
         this.block.appendChild(this.img)
@@ -684,8 +694,8 @@ class EnemyWithSeparateImg {
         this.armorArray.pop()
     }
     moveWorld(dir) {
-        this.startX = this.startX - 0.5 * dir
-        this.posX = this.posX - 0.5 * dir
+        this.startX = this.startX - 1 * dir
+        this.posX = this.posX - 1 * dir
     }
     lifeCycle() {
         // clearInterval(this.timer)
@@ -786,7 +796,7 @@ class EnemyWithSeparateImg {
         }
         this.posX += this.direction / 2
         this.img.style.transform = `scale(${this.direction},1)`
-        this.block.style.left = (this.posX * 64).toString() + 'px'
+        this.block.style.left = (this.posX * 32).toString() + 'px'
     }
     checkDamage() {
         this.stop = true
@@ -862,7 +872,7 @@ class Items {
         this.posY = y
         this.startY = y
         this.direction = 1
-        this.blockSize = 128
+        this.blockSize = 64
         this.useble = true
         this.createImg()
         this.lifeCycle()
@@ -870,8 +880,8 @@ class Items {
     createImg() {
         this.block = window.document.createElement('div')
         this.block.style.position = 'absolute'
-        this.block.style.left = (this.posX * 64).toString() + 'px'
-        this.block.style.bottom = (this.posY * 64).toString() + 'px'
+        this.block.style.left = (this.posX * 32).toString() + 'px'
+        this.block.style.bottom = (this.posY * 32).toString() + 'px'
         this.block.style.width = `${this.blockSize}px`
         this.block.style.height = `${this.blockSize}px`
         this.block.style.overflow = 'hidden'
@@ -882,8 +892,8 @@ class Items {
         this.img.style.position = 'absolute'
         this.img.style.left = '0px'
         this.img.style.bottom = '0px'
-        this.img.style.width = `48px`
-        this.img.style.height = `48px`
+        this.img.style.width = `24px`
+        this.img.style.height = `24px`
 
         this.block.appendChild(this.img)
         canvas.appendChild(this.block)
@@ -895,7 +905,7 @@ class Items {
                 this.direction *= -1
             }
             this.posY += this.direction / 2
-            this.block.style.bottom = (this.posY * 64).toString() + 'px'
+            this.block.style.bottom = (this.posY * 32).toString() + 'px'
             this.checkCol()
         }, 150)
     }
@@ -916,8 +926,8 @@ class Items {
         }
     }
     moveWorld(dir) {
-        this.posX = this.posX - 0.5 * dir
-        this.block.style.left = (this.posX * 64).toString() + 'px'
+        this.posX = this.posX - 1 * dir
+        this.block.style.left = (this.posX * 32).toString() + 'px'
     }
 }
 //======================================================START=FUNCTIONS===========================================
@@ -982,31 +992,51 @@ const createBackground = (src) => {
     }
 }
 const platformsLvlOne = [
-    { x: 0, y: 0, length: 10 },
-    { x: 15, y: 0, length: 40 },
-    { x: 5, y: 5, length: 10 },
-    { x: 15, y: 8, length: 5 },
-    { x: 22, y: 10, length: 10 }
+    { x: 0, y: 4, length: 12, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png', floor: true },
+    { x: 12, y: 1, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    { x: 18, y: 1, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    { x: 22, y: 2, length: 5, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    { x: 27, y: 3, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    { x: 37, y: 3, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    { x: 44, y: 5, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    { x: 50, y: 5, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    // { x: 54, y: 14, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    // { x: 60, y: 15, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    // { x: 63, y: 17, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    { x: 66, y: 18, length: 10, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+
+    { x: 0, y: 22, length: 12, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 48, y: 8, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 51, y: 11, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 46, y: 16, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 35, y: 16, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 30, y: 14, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 26, y: 12, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 20, y: 16, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 14, y: 18, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 19, y: 24, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 32, y: 24, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 44, y: 24, length: 16, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
 ]
 const enemiesLvlOne = [
-    new EnemyWithSeparateImg(16, 1, 12, enemiesImages.cultist, 100, 3),
-    new EnemyWithSeparateImg(20, 1, 10, enemiesImages.cultist, 100, 3),
-    new EnemyWithSeparateImg(4, 6, 9, enemiesImages.minotaur, 75, 6, 4),
-    new EnemyWithSeparateImg(14, 9, 4, enemiesImages.minotaur, 75, 6, 4),
-    new EnemyWithSeparateImg(26, 1, 8, enemiesImages.cultist, 100, 3),
-    new EnemyWithSeparateImg(30, 1, 5, enemiesImages.cultist, 100, 3),
-    new EnemyWithSeparateImg(40, 1, 5, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(12, 2, 2, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(22, 3, 2, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(3, 23, 5, enemiesImages.minotaur, 75, 6, 4),
+    new EnemyWithSeparateImg(19, 25, 4, enemiesImages.minotaur, 75, 6, 4),
+    new EnemyWithSeparateImg(33, 25, 3, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(45, 25, 2, enemiesImages.cultist, 100, 3),
+    // new EnemyWithSeparateImg(40, 1, 5, enemiesImages.cultist, 100, 3),
 ]
 const itemsLvlOne = [
-    new Items(3, 1),
-    new Items(6, 6),
-    new Items(15, 9)
+    new Items(29, 4),
+    new Items(2, 23),
+    new Items(6, 23)
 ]
 const createLevel = (platforms, enemiesArray, itemsArray) => {
     createBackground("bg_test2.png")
     tileArray = []
     for (let i = 0; i < platforms.length; i++) {
-        createTilesPlatform(platforms[i].x, platforms[i].y, platforms[i].length)
+        createTilesPlatform(platforms[i].x, platforms[i].y, platforms[i].length, platforms[i].floorSrc,platforms[i].groundSrc, platforms[i].floor)
     }
     enemies = enemiesArray
     items = itemsArray

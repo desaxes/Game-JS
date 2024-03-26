@@ -13,8 +13,8 @@
 }
 
 .hero_block {
-  width: 200px;
-  height: 128px;
+  width: 100px;
+  height: 64px;
   position: absolute;
   -webkit-transition: 0.5s;
   transition: 0.2s;
@@ -22,8 +22,8 @@
 }
 .hero_block .hero {
   position: relative;
-  width: 800px;
-  height: 128px;
+  width: 400px;
+  height: 64px;
 }
 
 
