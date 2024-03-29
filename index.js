@@ -196,17 +196,19 @@ const setSprite = (imgWidth, imgSrc, maxPose, moveX, moveY, xDistance, yDistance
     }
     if (moveX) {
         // heroX = heroX + 0.5 * direction
-        if (blockPosition > window.screen.width - 300 && direction === 1) {
-            moveWorld(direction)
-        }
-        else if (blockPosition < 300 && direction === -1 && parseInt(firstBack.style.left) < 0) {
-            moveWorld(direction)
-        }
-        else {
-            if (blockPosition < 0 && direction === -1) { }
+        if (direction === 1 ? tileArray.some(e => e[0] === heroX + 2 && e[1] === heroY) : tileArray.some(e => e[0] === heroX && e[1] === heroY)) { } else {
+            if (blockPosition > window.screen.width - 300 && direction === 1) {
+                moveWorld(direction)
+            }
+            else if (blockPosition < 300 && direction === -1 && parseInt(firstBack.style.left) < 0) {
+                moveWorld(direction)
+            }
             else {
-                blockPosition = blockPosition - (xDistance * direction)
-                heroBlock.style.left = `${blockPosition}px`
+                if (blockPosition < 0 && direction === -1) { }
+                else {
+                    blockPosition = blockPosition - (xDistance * direction)
+                    heroBlock.style.left = `${blockPosition}px`
+                }
             }
         }
     }
@@ -271,7 +273,6 @@ const checkTile = () => {
     else {
         falling = false
     }
-    console.log(heroX,heroY)
 }
 const moveWorld = (dir) => {
     objectsArray.map(e => {
@@ -354,11 +355,14 @@ const createTile = (x, y = 0, src) => {
     tileArray.push([x, y])
     objectsArray.push(tile)
 }
-const createTilesPlatform = (startX, startY, length, floorSrc, groundSrc, floor) => {
+const createTilesPlatform = (startX, startY, length, floorSrc, groundSrc, floor, decs) => {
     if (floor) {
         for (let a = startY; a >= 0; a--) {
             for (let i = 0; i < length; i++) {
-                if (a === startY) { createTile(startX + i, a, floorSrc) }
+                if (a === startY) {
+                    createTile(startX + i, a, floorSrc)
+                    if (decs) { createDecs(startX + i, startY, 'img/3 Objects/Bushes/15.png', 32, 16, 'full') }
+                }
                 else { createTile(startX + i, a, groundSrc) }
             }
         }
@@ -371,6 +375,44 @@ const createTilesPlatform = (startX, startY, length, floorSrc, groundSrc, floor)
 }
 const addTiles = (i) => {
     createTile(i)
+}
+const createDecs = (x, y, src, width, height, method, soloX) => {
+    let decoration = window.document.createElement('img')
+    decoration.src = src
+    decoration.style.position = 'absolute'
+    decoration.style.left = (x * 32).toString() + 'px'
+    decoration.style.bottom = ((y + 1) * 32).toString() + 'px'
+    decoration.style.width = width + 'px'
+    decoration.style.height = height + 'px'
+    decoration.style.transition = '0.2s'
+    switch (method) {
+        case 'full':
+            objectsArray.push(decoration)
+            canvas.appendChild(decoration)
+            break;
+        case 'before':
+            if (x % 2 === 0) {
+                objectsArray.push(decoration)
+                canvas.appendChild(decoration)
+            }
+            break;
+        case 'after':
+            if (x % 2 != 0) {
+                objectsArray.push(decoration)
+                canvas.appendChild(decoration)
+            }
+            break;
+
+        case 'solo':
+            if (x === soloX) {
+                objectsArray.push(decoration)
+                canvas.appendChild(decoration)
+            }
+            break;
+        default:
+            break;
+    }
+
 }
 
 // ===================================================ENEMIES======================================================
@@ -953,7 +995,6 @@ const startHero = () => {
         else {
             heroAnim('idle')
         }
-        console.log(firstBack.style.left)
     }, 100)
 }
 const addHearts = () => {
@@ -992,31 +1033,49 @@ const createBackground = (src) => {
     }
 }
 const platformsLvlOne = [
-    { x: 0, y: 4, length: 12, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png', floor: true },
-    { x: 12, y: 1, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    { x: 18, y: 1, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    { x: 22, y: 2, length: 5, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    { x: 27, y: 3, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    { x: 37, y: 3, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    { x: 44, y: 5, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    { x: 50, y: 5, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    // { x: 54, y: 14, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    // { x: 60, y: 15, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    // { x: 63, y: 17, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
-    { x: 66, y: 18, length: 10, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:true },
+    { x: 0, y: 4, length: 12, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true, decs: true },
+    { x: 12, y: 1, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true },
+    { x: 18, y: 1, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true },
+    { x: 22, y: 2, length: 5, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true, decs: true },
+    { x: 27, y: 3, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true, decs: true },
+    { x: 37, y: 3, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true },
+    { x: 44, y: 5, length: 10, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true, decs: true },
+    { x: 66, y: 18, length: 10, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true },
+    { x: 76, y: 1, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true },
+    { x: 86, y: 1, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true, decs: true },
+    { x: 96, y: 1, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true, decs: true },
+    { x: 106, y: 1, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true, decs: true },
+    { x: 118, y: 1, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true, decs: true },
+    { x: 148, y: 20, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true },
+    { x: 180, y: 4, length: 6, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: true, decs: true },
 
-    { x: 0, y: 22, length: 12, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 48, y: 8, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 51, y: 11, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 46, y: 16, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 35, y: 16, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 30, y: 14, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 26, y: 12, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 20, y: 16, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 14, y: 18, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 19, y: 24, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 32, y: 24, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
-    { x: 44, y: 24, length: 16, floorSrc: 'img/1 Tiles/Tile_11.png',groundSrc:'img/1 Tiles/Tile_04.png',floor:false },
+    { x: 0, y: 22, length: 12, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 48, y: 8, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 51, y: 11, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 46, y: 16, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 35, y: 16, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 30, y: 14, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 26, y: 12, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 20, y: 16, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 14, y: 18, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 19, y: 24, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 32, y: 24, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 44, y: 24, length: 16, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 76, y: 12, length: 10, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 90, y: 14, length: 10, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 90, y: 22, length: 30, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 124, y: 16, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 130, y: 23, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 140, y: 23, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 148, y: 25, length: 8, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 128, y: 5, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 136, y: 8, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 130, y: 10, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 138, y: 14, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 142, y: 18, length: 4, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 164, y: 25, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+    { x: 172, y: 24, length: 3, floorSrc: 'img/1 Tiles/Tile_11.png', groundSrc: 'img/1 Tiles/Tile_04.png', floor: false },
+
 ]
 const enemiesLvlOne = [
     new EnemyWithSeparateImg(12, 2, 2, enemiesImages.cultist, 100, 3),
@@ -1025,27 +1084,45 @@ const enemiesLvlOne = [
     new EnemyWithSeparateImg(19, 25, 4, enemiesImages.minotaur, 75, 6, 4),
     new EnemyWithSeparateImg(33, 25, 3, enemiesImages.cultist, 100, 3),
     new EnemyWithSeparateImg(45, 25, 2, enemiesImages.cultist, 100, 3),
-    // new EnemyWithSeparateImg(40, 1, 5, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(66, 19, 5, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(76, 2, 3, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(86, 2, 2, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(96, 2, 2, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(106, 2, 2, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(118, 2, 2, enemiesImages.cultist, 100, 3),
+    new EnemyWithSeparateImg(106, 23, 4, enemiesImages.minotaur, 75, 6, 4),
+    new EnemyWithSeparateImg(90, 23, 4, enemiesImages.minotaur, 75, 6, 4),
+    new EnemyWithSeparateImg(98, 23, 4, enemiesImages.minotaur, 75, 6, 4),
+    new EnemyWithSeparateImg(147, 21, 3, enemiesImages.minotaur, 75, 6, 4),
 ]
 const itemsLvlOne = [
     new Items(29, 4),
     new Items(2, 23),
-    new Items(6, 23)
+    new Items(6, 23),
+    new Items(79, 13),
+    new Items(117, 23)
 ]
 const createLevel = (platforms, enemiesArray, itemsArray) => {
     createBackground("bg_test2.png")
     tileArray = []
     for (let i = 0; i < platforms.length; i++) {
-        createTilesPlatform(platforms[i].x, platforms[i].y, platforms[i].length, platforms[i].floorSrc,platforms[i].groundSrc, platforms[i].floor)
+        createTilesPlatform(platforms[i].x, platforms[i].y, platforms[i].length, platforms[i].floorSrc, platforms[i].groundSrc, platforms[i].floor, platforms[i].decs)
     }
     enemies = enemiesArray
     items = itemsArray
+
+}
+const createDecsLvlOne = () => {
+    createDecs(181, 4, 'img/3 Objects/Fountain/1.png', 128, 96, 'solo', 181)
+    createDecs(36, 3, 'img/3 Objects/Other/Tree3.png', 256, 320, 'solo', 36)
+    createDecs(46, 5, 'img/3 Objects/Stones/6.png', 128, 64, 'solo', 46)
 }
 const appStart = () => {
     addHearts()
     updateHearts()
-    startHero()
     createLevel(platformsLvlOne, enemiesLvlOne, itemsLvlOne)
+    createDecsLvlOne()
+    startHero()
 }
 
 // ======================================================APP=START==================================================
